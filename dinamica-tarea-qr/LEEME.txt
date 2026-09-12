@@ -1,0 +1,9 @@
+DINÁMICA QR, EL CHISME ESCOLAR
+
+index.html muestra la portada y genera el QR hacia student.html.
+student.html solicita el nombre completo y consulta el estado protegido.
+status-map.json conserva solo hashes SHA-256 y estados, sin nombres completos.
+admin.html permite preparar cambios y descargar un status-map.json actualizado.
+
+Para probar localmente usa INICIAR_LOCAL.bat o un servidor HTTP.
+Para publicar cambios de estado, reemplaza status-map.json en GitHub.
