@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mensaje oculto</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#172033}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#eef4ff,#f8fbff);padding:20px}.card{width:min(540px,100%);background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(24,55,100,.15);padding:30px}.emoji{font-size:54px;text-align:center}h1{text-align:center;font-size:30px;margin:8px 0 10px}p{line-height:1.45}label{display:block;font-weight:700;margin:22px 0 8px}input{width:100%;font-size:18px;padding:15px 16px;border:2px solid #dbe4f0;border-radius:14px;outline:none}input:focus{border-color:#668cff}button{width:100%;margin-top:14px;padding:15px;border:0;border-radius:14px;background:#1d4ed8;color:#fff;font-size:18px;font-weight:700;cursor:pointer}button:disabled{opacity:.65}#result{display:none;margin-top:20px;padding:20px;border-radius:18px}.ok{background:#ecfdf3;border:1px solid #a7f3d0}.pending{background:#fff7ed;border:1px solid #fed7aa}.unknown{background:#f8fafc;border:1px solid #cbd5e1}.big{font-size:34px;margin-bottom:8px}.name{font-weight:800;font-size:20px}.small{font-size:13px;color:#64748b;text-align:center;margin-top:16px}
+</style>
+</head>
+<body>
+<main class="card">
+<div class="emoji">🔐</div>
+<h1>Hay un mensaje oculto para ti</h1>
+<p>Escribe tu nombre completo para ver tu resultado.</p>
+<label for="name">Tu nombre completo</label>
+<input id="name" autocomplete="name" placeholder="Escribe tu nombre completo">
+<button id="check">Descubrir mensaje</button>
+<section id="result"></section>
+<div class="small">Escribe tu nombre como aparece en la lista de tu docente.</div>
+</main>
+<script>
+const input=document.getElementById('name');
+const btn=document.getElementById('check');
+const result=document.getElementById('result');
+function normalizeName(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ')}
+async function hashName(value){const bytes=new TextEncoder().encode(normalizeName(value));const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+async function check(){
+ const typed=input.value.trim();
+ if(!typed){input.focus();return}
+ btn.disabled=true;btn.textContent='Buscando...';
+ try{
+  const [key,r]=await Promise.all([hashName(typed),fetch('./status-map.json?v='+Date.now(),{cache:'no-store'})]);
+  const map=await r.json();const status=map[key];
+  result.style.display='block';
+  if(!status){result.className='unknown';result.innerHTML='<div class="big">🤔</div><div class="name">No encuentro tu nombre</div><p>Revisa la escritura de tu nombre completo e inténtalo otra vez.</p>';return}
+  if(status==='cumplio'){
+   result.className='ok';
+   result.innerHTML='<div class="big">🎉 ⭐ ✅</div><div class="name">'+esc(typed)+'</div><h2>¡Misión cumplida!</h2><p>¡Felicidades! Cumpliste con tu tarea. Tu responsabilidad y esfuerzo cuentan. Sigue trabajando con esa actitud.</p>';
+  }else{
+   result.className='pending';
+   result.innerHTML='<div class="big">😕 📚</div><div class="name">'+esc(typed)+'</div><h2>Tarea pendiente</h2><p>Esta vez no cumpliste con la tarea y me decepciona ver tu actividad pendiente. Aún tienes oportunidad de cambiar este resultado. Completa tu trabajo y demuestra tu compromiso.</p>';
+  }
+ }catch(e){result.style.display='block';result.className='unknown';result.innerHTML='<div class="big">⚠️</div><p>No pude consultar tu resultado. Intenta nuevamente.</p>'}
+ finally{btn.disabled=false;btn.textContent='Descubrir mensaje'}
+}
+btn.addEventListener('click',check);input.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+</script>
+</body>
+</html>
