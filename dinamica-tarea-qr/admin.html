@@ -20,9 +20,7 @@
 </section></main>
 <script>
 let currentMap=null;
-function normalizeName(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ')}
-async function hashName(value){const bytes=new TextEncoder().encode(normalizeName(value));const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('')}
-async function prepare(){const name=document.getElementById('name').value.trim();if(!name){document.getElementById('name').focus();return}const status=document.getElementById('status').value;const r=await fetch('./status-map.json?v='+Date.now(),{cache:'no-store'});currentMap=await r.json();const key=await hashName(name);currentMap[key]=status;const box=document.getElementById('ok');box.style.display='block';box.textContent='Cambio preparado para '+name+': '+(status==='cumplio'?'Cumplió':'Pendiente')+'.';document.getElementById('download').disabled=false}
+async function prepare(){const name=document.getElementById('name').value.trim();if(!name){document.getElementById('name').focus();return}const status=document.getElementById('status').value;const r=await fetch('./status-map.json?v='+Date.now(),{cache:'no-store'});currentMap=await r.json();const existing=Object.keys(currentMap).find(key=>key.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ')===name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' '));currentMap[existing||name]=status;const box=document.getElementById('ok');box.style.display='block';box.textContent='Cambio preparado para '+name+': '+(status==='cumplio'?'Cumplió':'Pendiente')+'.';document.getElementById('download').disabled=false}
 function downloadMap(){if(!currentMap)return;const blob=new Blob([JSON.stringify(currentMap,null,2)+'\n'],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='status-map.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 document.getElementById('prepare').onclick=prepare;document.getElementById('download').onclick=downloadMap;
 </script>
