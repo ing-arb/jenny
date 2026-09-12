@@ -36,6 +36,9 @@
     .orb2{width:320px;height:320px;background:rgba(255,216,107,.12);right:-80px;top:40px;animation-delay:-2s}
     .orb3{width:260px;height:260px;background:rgba(129,140,248,.18);left:30%;bottom:-120px;animation-delay:-5s}
     @keyframes float{50%{transform:translateY(18px) translateX(8px) scale(1.05)}}
+    .gossip{position:fixed;z-index:1;font-size:42px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.22));animation:drift 4.5s ease-in-out infinite;pointer-events:none}
+    .g1{top:8%;left:47%}.g2{right:3%;bottom:19%;animation-delay:-1.5s}.g3{left:4%;bottom:10%;animation-delay:-3s}
+    @keyframes drift{50%{transform:translateY(-16px) rotate(8deg) scale(1.12)}}
     .wrap{
       width:min(1240px,95vw);
       margin:auto;
@@ -82,26 +85,27 @@
 </head>
 <body>
   <div class="orb"></div><div class="orb2"></div><div class="orb3"></div>
+  <div class="gossip g1">👀</div><div class="gossip g2">🤫</div><div class="gossip g3">😏</div>
   <main class="wrap">
     <section class="hero">
-      <div class="badge"><span>✨</span> Dinámica sorpresa del día</div>
-      <h1>Escanea.<br>Escribe tu nombre.<br>Descubre tu mensaje.</h1>
-      <div class="lead">Hoy hay una respuesta esperándote. Cada estudiante verá un mensaje único en su celular.</div>
-      <div class="chips"><div class="chip">📱 Escanea el QR</div><div class="chip">✍️ Escribe tu nombre</div><div class="chip">🎁 Descubre tu resultado</div></div>
+      <div class="badge"><span>✨</span> El chisme escolar del día</div>
+      <h1>Escanea.<br>Escribe tu nombre.<br>Mira qué dice el reporte.</h1>
+      <div class="lead">Hay un mensaje secreto esperándote. ¿Cumpliste o el chisme dice pendiente?</div>
+      <div class="chips"><div class="chip">📱 Escanea el QR</div><div class="chip">✍️ Escribe tu nombre</div><div class="chip">👀 Descubre tu resultado</div></div>
       <div class="callout-grid">
-        <div class="callout"><strong>Intriga total</strong><span>Primero escanean y luego descubren qué les aparece.</span></div>
-        <div class="callout"><strong>Mensaje personal</strong><span>Cada estudiante recibe una respuesta distinta.</span></div>
-        <div class="callout"><strong>Resultado privado</strong><span>La respuesta aparece solo en el celular de quien escribe su nombre.</span></div>
+        <div class="callout"><strong>Intriga total 👀</strong><span>Primero escanean y luego descubren qué dice el reporte.</span></div>
+        <div class="callout"><strong>Mensaje personal 😏</strong><span>Cada estudiante recibe una respuesta distinta.</span></div>
+        <div class="callout"><strong>Resultado privado 🤫</strong><span>La respuesta aparece solo en el celular de quien escribe su nombre.</span></div>
       </div>
     </section>
     <aside class="qr-panel">
-      <div class="topline"><div class="smalltag">🔍 Mensaje secreto</div><div class="counter" id="counterText">Listos para descubrir</div></div>
+      <div class="topline"><div class="smalltag">🤫 Mensaje secreto</div><div class="counter" id="counterText">Listos para descubrir</div></div>
       <div class="screen">
         <div class="scan-glow">📲</div>
-        <h2>Tu mensaje te está esperando</h2>
-        <p>Escanea el código y entra al reto.</p>
+        <h2>¿Quieres saber el chisme?</h2>
+        <p>Escanea el código y mira tu resultado.</p>
         <div class="qrbox"><img id="qr" alt="Código QR"></div>
-        <div class="qr-tip">🚀 Escanea ahora</div>
+        <div class="qr-tip">👀 Escanea ahora</div>
       </div>
       <div class="pulse-ring" aria-hidden="true"></div>
     </aside>
@@ -109,7 +113,7 @@
 <script>
 const url=new URL('student.html',location.href).href;
 document.getElementById('qr').src='https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=8&data='+encodeURIComponent(url);
-const phrases=['¿Quién descubrirá primero su mensaje?','Cada nombre abre una sorpresa','Hoy tu celular tiene la respuesta','Escanea y entra al reto','Un mensaje distinto te espera'];
+const phrases=['¿Quién descubrirá primero el chisme?','Cada nombre abre una sorpresa 🤫','Hoy tu celular tiene la respuesta','Escanea y mira qué dice 👀','Un mensaje distinto te espera 😏','La curiosidad te trajo hasta aquí ✨'];
 let i=0;setInterval(()=>{i=(i+1)%phrases.length;document.getElementById('counterText').textContent=phrases[i]},2400);
 </script>
 </body>
