@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Actualizar estado de tarea</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;font-family:Arial,Helvetica,sans-serif;color:#172033;padding:24px}main{max-width:760px;margin:auto}.card{background:#fff;border-radius:22px;padding:24px;box-shadow:0 14px 45px rgba(30,60,100,.12)}h1{margin-top:0}label{display:block;font-weight:700;margin:18px 0 7px}input,select{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:11px;font-size:16px}button{border:0;border-radius:11px;padding:13px 16px;margin-top:14px;font-weight:700;cursor:pointer}.primary{background:#1d4ed8;color:#fff}.secondary{background:#e2e8f0;color:#172033}.ok{display:none;margin-top:18px;padding:16px;background:#ecfdf3;border:1px solid #a7f3d0;border-radius:14px}.note{color:#64748b;line-height:1.45}.steps{background:#f8fafc;border-radius:14px;padding:15px;margin-top:18px}.steps p{margin:8px 0}
+</style>
+</head>
+<body>
+<main><section class="card">
+<h1>Actualizar estado de tarea</h1>
+<p class="note">Escribe el nombre completo y el nuevo estado. Después descarga el archivo actualizado.</p>
+<label for="name">Nombre completo</label><input id="name" placeholder="Nombre y apellidos">
+<label for="status">Nuevo estado</label><select id="status"><option value="cumplio">✅ Cumplió</option><option value="pendiente">⏳ Pendiente</option></select>
+<button class="primary" id="prepare">Preparar cambio</button>
+<div id="ok" class="ok"></div>
+<button class="secondary" id="download" disabled>Descargar archivo actualizado</button>
+<div class="steps"><p>Después de descargarlo, reemplaza en GitHub el archivo status-map.json por el nuevo archivo.</p><p>Cuando GitHub publique el cambio, los celulares verán el nuevo estado.</p></div>
+</section></main>
+<script>
+let currentMap=null;
+function normalizeName(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ')}
+async function hashName(value){const bytes=new TextEncoder().encode(normalizeName(value));const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+async function prepare(){const name=document.getElementById('name').value.trim();if(!name){document.getElementById('name').focus();return}const status=document.getElementById('status').value;const r=await fetch('./status-map.json?v='+Date.now(),{cache:'no-store'});currentMap=await r.json();const key=await hashName(name);currentMap[key]=status;const box=document.getElementById('ok');box.style.display='block';box.textContent='Cambio preparado para '+name+': '+(status==='cumplio'?'Cumplió':'Pendiente')+'.';document.getElementById('download').disabled=false}
+function downloadMap(){if(!currentMap)return;const blob=new Blob([JSON.stringify(currentMap,null,2)+'\n'],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='status-map.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.getElementById('prepare').onclick=prepare;document.getElementById('download').onclick=downloadMap;
+</script>
+</body>
+</html>
